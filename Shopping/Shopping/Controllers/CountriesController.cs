@@ -22,9 +22,7 @@ namespace Shopping.Controllers
         // GET: Countries
         public async Task<IActionResult> Index()
         {
-              return _context.Countries != null ? 
-                          View(await _context.Countries.ToListAsync()) :
-                          Problem("Entity set 'DataContext.Countries'  is null.");
+            return View(await _context.Countries.ToListAsync());
         }
 
         // GET: Countries/Details/5
@@ -51,18 +49,40 @@ namespace Shopping.Controllers
             return View();
         }
 
-        // POST: Countries/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] Country country)
+        public async Task<IActionResult> Create(Country country)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(country);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                //para evitar que se ingrese un pais repetido
+                try
+                {
+                    _context.Add(country);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException dbUpdateException) //si fallo la actualizacion, lanza excepcion
+                {
+                    if (dbUpdateException.InnerException.Message.Contains("duplicada")) //en la excepcion dice 'duplicate'
+                    {
+                        //agregamos un nuevo error al ModelState                        
+                        //string.Empty, significa que el error no está asociado con un campo específico del modelo, sino que es un error general 
+                        ModelState.AddModelError(string.Empty, "Ya existe un país con el mismo nombre.");
+                    }
+                    else
+                    {
+                        //si el error no tiene la palabra duplicada, muestro el mensaje de error detallado
+                        ModelState.AddModelError(string.Empty, dbUpdateException.InnerException.Message);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    //si es un error general, igual lo muestro
+                    ModelState.AddModelError(string.Empty, exception.Message);
+                }
+
             }
             return View(country);
         }
@@ -70,7 +90,7 @@ namespace Shopping.Controllers
         // GET: Countries/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Countries == null)
+            if (id == null || _context.Countries == null) //id puede llegar a ser nulo si lo modifica en la url
             {
                 return NotFound();
             }
@@ -83,12 +103,10 @@ namespace Shopping.Controllers
             return View(country);
         }
 
-        // POST: Countries/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Country country)
+        public async Task<IActionResult> Edit(int id, Country country)
         {
             if (id != country.Id)
             {
