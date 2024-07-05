@@ -105,33 +105,38 @@ namespace Shopping.Controllers
 
         
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken] // Este atributo es una medida de seguridad contra ataques CSRF (Cross-Site Request Forgery). Asegura que el formulario que envía la solicitud POST contiene un token válido generado por ASP.NET Core.
         public async Task<IActionResult> Edit(int id, Country country)
         {
-            if (id != country.Id)
+            if (id != country.Id) //chequeamos coincidencia de los idis
             {
-                return NotFound();
+                return NotFound();//mandamos 404
             }
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(country);
+                    _context.Countries.Update(country);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateException ex)
                 {
-                    if (!CountryExists(country.Id))
+                    if (ex.InnerException.Message.Contains("duplicada"))
                     {
-                        return NotFound();
+                        ModelState.AddModelError(string.Empty, "Ese país ya existe en la lista");
                     }
                     else
                     {
-                        throw;
+                        ModelState.AddModelError(string.Empty, ex.InnerException.Message);
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+                
             }
             return View(country);
         }
