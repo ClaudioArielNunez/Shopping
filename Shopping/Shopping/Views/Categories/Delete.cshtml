@@ -1,0 +1,21 @@
+﻿@model Shopping.Data.Entities.Category
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Delete</h1>
+
+<h3>¿Estas seguro de querer borrarlo?</h3>
+<div>
+    <partial name="_CategoryDetails" model="Model" />
+
+    <div class="mt-3">
+        <form asp-action="Delete">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for ="Id"/>
+            <input type="submit" value="Borrar" class="btn btn-outline-danger" />
+            <a asp-action="Index" class="btn btn-outline-success">Volver a Listado</a>
+        </form>
+    </div>
+</div>

@@ -178,9 +178,9 @@ namespace Shopping.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CountryExists(int id)
-        {
-          return (_context.Countries?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+        //private bool CountryExists(int id)
+        //{
+        //  return (_context.Countries?.Any(e => e.Id == id)).GetValueOrDefault();
+        //}
     }
 }

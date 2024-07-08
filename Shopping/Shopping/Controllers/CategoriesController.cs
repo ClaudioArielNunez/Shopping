@@ -125,6 +125,32 @@ namespace Shopping.Controllers
             return View(category);
         }
 
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if(id == null || _context.Countries == null)
+            {
+                return NotFound();
+            }
+            var category = await _context.Categories.FindAsync(id);
+            if (category == null) return NotFound();
+
+            return View(category);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(Category categoria)
+        {
+            if(categoria == null || _context.Countries == null)
+            {
+                return NotFound();
+            }
+            var category = await _context.Categories.FindAsync(categoria.Id);
+            if(category == null) return NotFound();
+
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
 
     }
 }
