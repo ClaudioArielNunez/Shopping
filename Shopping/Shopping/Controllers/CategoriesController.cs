@@ -114,5 +114,17 @@ namespace Shopping.Controllers
             return View(edicion);
         }
 
+        public async Task<IActionResult> Detail(int? id)
+        {
+            if(id == null)
+            {
+                return NotFound();
+            }
+            var category = await _context.Categories.FindAsync(id);
+            if(category == null) return NotFound();
+            return View(category);
+        }
+
+
     }
 }

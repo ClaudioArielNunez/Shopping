@@ -1,0 +1,16 @@
+﻿@model Shopping.Data.Entities.Category
+
+@{
+    ViewData["Title"] = "Category Details";
+}
+
+<h4>Detale Categoría</h4>
+<hr />
+<div class="row">
+    <div class="col-sm-2 fw-bold">
+        @Html.DisplayNameFor(model =>model.Name)
+    </div>
+    <div class="col-md-10">
+        @Html.DisplayFor(model => model.Name)
+    </div>
+</div>
