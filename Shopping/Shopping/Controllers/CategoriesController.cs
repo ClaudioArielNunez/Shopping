@@ -54,8 +54,64 @@ namespace Shopping.Controllers
                     ModelState.AddModelError(string.Empty, ex.Message);
                 }
             }
-            
             return View(categoria);
+        }
+
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id != null || _context.Categories != null)
+            {
+                var category = await _context.Categories.FindAsync(id);
+                if (category == null)
+                {
+                    return NotFound();
+                }
+                return View(category);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Category edicion)
+        {
+            if (ModelState.IsValid)
+            {
+                if (edicion != null)
+                {
+                    var categoria = await _context.Categories.FirstOrDefaultAsync(x => x.Id == edicion.Id);
+                    if (categoria == null)
+                    {
+                        return NotFound();
+                    }
+                    try
+                    {
+                        categoria.Name = edicion.Name;
+                        _context.Categories.Update(categoria);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    }
+                    catch (DbUpdateException dbException)
+                    {
+                        if (dbException.InnerException.Message.Contains("duplicada"))
+                        {
+                            ModelState.AddModelError(string.Empty, "No pueden existir categorias duplicadas");
+                        }
+                        else
+                        {
+                            ModelState.AddModelError(string.Empty, dbException.InnerException.Message);
+                        }                
+                    }
+                    catch (Exception ex)
+                    {
+                        ModelState.AddModelError(string.Empty, ex.Message);
+                    }
+                }
+            }
+            return View(edicion);
         }
 
     }
