@@ -21,6 +21,42 @@ namespace Shopping.Controllers
             //return View(await _context.Categories.ToListAsync());
         }
 
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Category categoria)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Categories.Add(categoria);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException dbUpdateException)
+                {
+                    if (dbUpdateException.InnerException.Message.Contains("duplicada"))
+                    {
+                        ModelState.AddModelError(string.Empty, "Ya existe una categoría con ese mismo nombre");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, dbUpdateException.InnerException.Message);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+            }
+            
+            return View(categoria);
+        }
 
     }
 }
