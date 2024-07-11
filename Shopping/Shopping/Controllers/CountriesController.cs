@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Shopping.Data;
 using Shopping.Data.Entities;
+using Shopping.Models;
 
 namespace Shopping.Controllers
 {
@@ -49,7 +45,7 @@ namespace Shopping.Controllers
             return View();
         }
 
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Country country)
@@ -87,6 +83,64 @@ namespace Shopping.Controllers
             return View(country);
         }
 
+        // GET: Countries/AddState
+        public async Task<IActionResult> AddState(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            Country country = await _context.Countries.FindAsync(id);
+            if (country == null)
+            {
+                return NotFound();
+            }
+            //si encontro el pais creamos el ViewModel
+            StateViewModel model = new()
+            {
+                CountryId = country.Id,
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddState(StateViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    State state = new State()
+                    {
+                        Cities = new List<City>(),
+                        Country = await _context.Countries.FindAsync(model.CountryId),
+                        Name = model.Name,
+                    };
+                    _context.Add(state);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Details), new { Id = model.CountryId });
+                }
+                catch (DbUpdateException ex)
+                {
+                    if (ex.InnerException.Message.Contains("duplicada"))
+                    {
+                        ModelState.AddModelError(string.Empty, "Ya existe una provincia con el mismo nombre en este país.");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, ex.InnerException.Message);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+            }
+            return View(model);
+        }
+
         // GET: Countries/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -103,7 +157,7 @@ namespace Shopping.Controllers
             return View(country);
         }
 
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken] // Este atributo es una medida de seguridad contra ataques CSRF (Cross-Site Request Forgery). Asegura que el formulario que envía la solicitud POST contiene un token válido generado por ASP.NET Core.
         public async Task<IActionResult> Edit(int id, Country country)
@@ -136,7 +190,7 @@ namespace Shopping.Controllers
                 {
                     ModelState.AddModelError(string.Empty, ex.Message);
                 }
-                
+
             }
             return View(country);
         }
@@ -173,7 +227,7 @@ namespace Shopping.Controllers
             {
                 _context.Countries.Remove(country);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

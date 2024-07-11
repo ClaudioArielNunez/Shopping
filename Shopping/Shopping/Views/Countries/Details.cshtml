@@ -11,6 +11,8 @@
     <partial name="_CountryDetails" model="Model" />
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-outline-warning">Editar</a> 
+    @* boton para agregar estados, despues de tener las entidades State/city *@
+    <a asp-action="AddState" asp-route-id="@Model.Id" class="btn btn-outline-primary">Agregar Provincia/Estado</a>
+    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-outline-warning">Editar País</a> 
     <a asp-action="Index" class="btn btn-outline-success">Volver a listado</a>
 </div>
