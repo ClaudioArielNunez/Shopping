@@ -18,7 +18,10 @@ namespace Shopping.Controllers
         // GET: Countries
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Countries.ToListAsync());
+            
+            //con include mostramos los estados de addState/ por cada pais incluya los estados
+            return View(await _context.Countries.Include(c => c.States).ToListAsync());
+            //return View(await _context.Countries.ToListAsync());
         }
 
         // GET: Countries/Details/5
@@ -28,9 +31,8 @@ namespace Shopping.Controllers
             {
                 return NotFound();
             }
-
-            var country = await _context.Countries
-                .FirstOrDefaultAsync(m => m.Id == id);
+            //para q muestre los estados agregamos include
+            var country = await _context.Countries.Include(c => c.States).FirstOrDefaultAsync(m => m.Id == id);
             if (country == null)
             {
                 return NotFound();
@@ -202,8 +204,9 @@ namespace Shopping.Controllers
             {
                 return NotFound();
             }
-
+            //mostramos los estados con include
             var country = await _context.Countries
+                .Include(c => c.States)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (country == null)
             {
