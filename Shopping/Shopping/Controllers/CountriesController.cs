@@ -44,6 +44,9 @@ namespace Shopping.Controllers
         // GET: Countries/Create
         public IActionResult Create()
         {
+            //si se rompe el boton crear puede ser porque la lista states sea null en ese caso:
+            //Country country = new() { States = new List<State>() };
+            //return View(country);
             return View();
         }
 
@@ -233,6 +236,78 @@ namespace Shopping.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Countries/EditState/5
+        public async Task<IActionResult> EditState(int? id) //el id es de un state
+        {
+            if (id == null || _context.States == null) //id puede llegar a ser nulo si lo modifica en la url
+            {
+                return NotFound();
+            }
+
+            State state = await _context.States
+                .Include(s =>s.Country)  //quiero saber a q pais pertenece
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (state == null)
+            {
+                return NotFound();
+            }
+            //creamos un stateviewModel, conseguimos estos datos gracias al include
+            StateViewModel model = new()
+            {
+                CountryId = state.Country.Id,
+                Id = state.Id,
+                Name = state.Name,
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken] // Este atributo es una medida de seguridad contra ataques CSRF (Cross-Site Request Forgery). Asegura que el formulario que envía la solicitud POST contiene un token válido generado por ASP.NET Core.
+        public async Task<IActionResult> EditState(int id, StateViewModel model)
+        {
+            if (id != model.Id) //chequeamos coincidencia de los idis
+            {
+                return NotFound();//mandamos 404
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    //creo el state a partir del model
+                    State state = new()
+                    {
+                        Id = model.Id,
+                        Name = model.Name,
+
+                    };
+
+                    _context.States.Update(state);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Details), new {Id = model.CountryId});
+                }
+                catch (DbUpdateException ex)
+                {
+                    if (ex.InnerException.Message.Contains("duplicada"))
+                    {
+                        ModelState.AddModelError(string.Empty, "Ya existe un departamento/estado con el mismo nombre en ese país");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, ex.InnerException.Message);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+
+            }
+            return View(model);
         }
 
         //private bool CountryExists(int id)

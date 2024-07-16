@@ -13,6 +13,9 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+            @* Este input era porque el boton crear mandaba la lista null *@
+            @* <input type="hidden" asp-for="States"/> *@
+
             @* como este codigo se repite en edit, lo ponemos en una vista parcial *@            
            @*  <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
