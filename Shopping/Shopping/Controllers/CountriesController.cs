@@ -62,6 +62,7 @@ namespace Shopping.Controllers
                 {
                     _context.Add(country);
                     await _context.SaveChangesAsync();
+                    TempData["successMessage"] = "País creado con exito!";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateException dbUpdateException) //si fallo la actualizacion, lanza excepcion
@@ -85,6 +86,7 @@ namespace Shopping.Controllers
                 }
 
             }
+            TempData["errorMessage"] = "No se pudo ingresar el país";
             return View(country);
         }
 
