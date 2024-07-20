@@ -10,10 +10,11 @@
 <div>
     @* usamos vista parcial *@
     <partial name="_CountryDetails" model="Model" />
-    
+    @Html.AntiForgeryToken()
+
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Borrar" class="btn btn-outline-danger" /> 
+        <input type="submit" value="Borrar" class="btn btn-outline-danger" />
         <a asp-action="Index" class="btn btn-outline-success">Volver a listado</a>
     </form>
 </div>

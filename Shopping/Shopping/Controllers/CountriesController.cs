@@ -127,6 +127,7 @@ namespace Shopping.Controllers
                     };
                     _context.Add(state);
                     await _context.SaveChangesAsync();
+                    TempData["successMessage"] = "Estado agregado con exito!";
                     return RedirectToAction(nameof(Details), new { Id = model.CountryId });
                 }
                 catch (DbUpdateException ex)
@@ -145,6 +146,7 @@ namespace Shopping.Controllers
                     ModelState.AddModelError(string.Empty, ex.Message);
                 }
             }
+            TempData["errorMessage"] = "No se pudo agregar el estado";
             return View(model);
         }
 
@@ -180,6 +182,7 @@ namespace Shopping.Controllers
                 {
                     _context.Countries.Update(country);
                     await _context.SaveChangesAsync();
+                    TempData["successMessage"] = "País editado con exito!";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateException ex)
@@ -187,6 +190,7 @@ namespace Shopping.Controllers
                     if (ex.InnerException.Message.Contains("duplicada"))
                     {
                         ModelState.AddModelError(string.Empty, "Ese país ya existe en la lista");
+                        
                     }
                     else
                     {
@@ -199,6 +203,7 @@ namespace Shopping.Controllers
                 }
 
             }
+            TempData["errorMessage"] = "No se pudo editar este país";
             return View(country);
         }
 
@@ -226,18 +231,27 @@ namespace Shopping.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Countries == null)
+            try
             {
-                return Problem("Entity set 'DataContext.Countries'  is null.");
-            }
-            var country = await _context.Countries.FindAsync(id);
-            if (country != null)
-            {
-                _context.Countries.Remove(country);
-            }
+                if (_context.Countries == null)
+                {
+                    return Problem("Entity set 'DataContext.Countries'  is null.");
+                }
+                var country = await _context.Countries.FindAsync(id);
+                if (country != null)
+                {
+                    _context.Countries.Remove(country);
+                }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
+                TempData["successMessage"] = "País eliminado con exito!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Delete),new { Id = id });                    
+            }
         }
 
         // GET: Countries/EditState/5
@@ -290,6 +304,7 @@ namespace Shopping.Controllers
 
                     _context.States.Update(state);
                     await _context.SaveChangesAsync();
+                    TempData["successMessage"] = "Estado editado con exito!";
                     return RedirectToAction(nameof(Details), new {Id = model.CountryId});
                 }
                 catch (DbUpdateException ex)
@@ -309,6 +324,7 @@ namespace Shopping.Controllers
                 }
 
             }
+            TempData["errorMessage"] = "No se pudo editar el estado";
             return View(model);
         }
 
