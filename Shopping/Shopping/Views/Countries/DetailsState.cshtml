@@ -14,7 +14,8 @@
     @* boton para agregar cities, despues de tener las entidades State/city *@
     <a asp-action="AddCity" asp-route-id="@Model?.Id" class="btn btn-outline-primary">Agregar Ciudad</a>
     <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-outline-warning">Editar</a>
-    <a asp-action="Details" asp-route-id="@Model?.Id" class="btn btn-outline-success">Volver a listado</a>
+    <a asp-action="Details" asp-route-id="@Model?.Country.Id" class="btn btn-outline-success">Volver a listado</a>
+    @* Es @Model?.Country.Id porque de lo contrario va a otro pais *@
 </div>
 <hr />
 

@@ -31,8 +31,12 @@ namespace Shopping.Controllers
             {
                 return NotFound();
             }
-            //para q muestre los estados agregamos include
-            var country = await _context.Countries.Include(c => c.States).FirstOrDefaultAsync(m => m.Id == id);
+            //para q muestre los estados agregamos include(funciona como un inner join)
+            //COUNTRY =>STATE =>  CITY
+            var country = await _context.Countries
+                .Include(country => country.States) //Relacion de 1º Nivel
+                .ThenInclude(state =>state.Cities) //Relacion de 2º Nivel y en adelante usamos ThenInclude
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (country == null)
             {
                 return NotFound();
@@ -49,7 +53,9 @@ namespace Shopping.Controllers
                 return NotFound();
             }
             State state = await _context.States
-                .Include(s => s.Cities).FirstOrDefaultAsync(s => s.Id == id);
+                .Include(s => s.Country) //Con esta linea hacemos q el boton volver nos regrese al pais q corresponde
+                .Include(s => s.Cities)
+                .FirstOrDefaultAsync(s => s.Id == id);
 
             if(state == null)
             {
