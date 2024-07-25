@@ -413,6 +413,83 @@ namespace Shopping.Controllers
             return View(model);
         }
 
+        // GET: Countries/EditCity/5
+        public async Task<IActionResult> EditCity(int? id) //el id es de una ciudad
+        {
+            if (id == null || _context.States == null) //id puede llegar a ser nulo si lo modifica en la url
+            {
+                return NotFound();
+            }
+
+            City city = await _context.Cities
+                .Include(city => city.State)  //quiero saber a q estado/Provincia pertenece
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (city == null)
+            {
+                return NotFound();
+            }
+            //creamos un stateviewModel, conseguimos estos datos gracias al include
+            CityViewModel model = new()
+            {
+                StateId = city.State.Id,
+                Id = city.Id,
+                Name = city.Name,
+            };
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken] // Este atributo es una medida de seguridad contra ataques CSRF (Cross-Site Request Forgery). Asegura que el formulario que envía la solicitud POST contiene un token válido generado por ASP.NET Core.
+        public async Task<IActionResult> EditCity(int id, CityViewModel model)
+        {
+            if (id != model.Id) //chequeamos coincidencia de los idis
+            {
+                return NotFound();//mandamos 404
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    //creo el state a partir del model
+                    City city = new()
+                    {
+                        Id = model.Id,
+                        Name = model.Name,
+                        //como estoy editando no necesito el id de la prop State
+                        
+                    };
+
+                    _context.Cities.Update(city);
+                    await _context.SaveChangesAsync();
+                    TempData["successMessage"] = "Ciudad editada con exito!";
+                    return RedirectToAction(nameof(DetailsState), new { Id = model.StateId });
+                }
+                catch (DbUpdateException ex)
+                {
+                    if (ex.InnerException.Message.Contains("duplicada"))
+                    {
+                        ModelState.AddModelError(string.Empty, "Ya existe una ciudad con el mismo nombre en ese departamento/provincia");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, ex.InnerException.Message);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+
+            }
+            TempData["errorMessage"] = "No se pudo editar la ciudad";
+            return View(model);
+        }
+
+
         //private bool CountryExists(int id)
         //{
         //  return (_context.Countries?.Any(e => e.Id == id)).GetValueOrDefault();
