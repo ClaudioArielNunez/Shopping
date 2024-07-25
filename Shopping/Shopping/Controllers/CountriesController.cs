@@ -168,6 +168,65 @@ namespace Shopping.Controllers
             return View(model);
         }
 
+        // GET: Countries/AddCity
+        public async Task<IActionResult> AddCity(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            State estado = await _context.States.FindAsync(id);
+            if (estado == null)
+            {
+                return NotFound();
+            }
+            //si encontro el estado creamos el ViewModel
+            CityViewModel model = new()
+            {
+                StateId = estado.Id,
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddCity(CityViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    City city = new City()
+                    {                        
+                        State = await _context.States.FindAsync(model.StateId),
+                        Name = model.Name,
+                    };
+                    _context.Add(city);
+                    await _context.SaveChangesAsync();
+                    TempData["successMessage"] = "Ciudad agregada con exito!";
+                    return RedirectToAction(nameof(DetailsState), new { Id = model.StateId });
+                }
+                catch (DbUpdateException ex)
+                {
+                    if (ex.InnerException.Message.Contains("duplicada"))
+                    {
+                        ModelState.AddModelError(string.Empty, "Ya existe una ciudad con el mismo nombre en este estado.");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, ex.InnerException.Message);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+            }
+            TempData["errorMessage"] = "No se pudo agregar la ciudad";
+            return View(model);
+        }
+
         // GET: Countries/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
