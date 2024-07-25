@@ -19,6 +19,9 @@
             @* importante enviar el id hidden *@
             <input type="hidden" asp-for="Id" />
 
+            @* importante enviar el id hidden para no perder la lista de estados *@
+            <input  type="hidden" asp-for="States"/>
+
             @* Incluir la vista parcial aquí y pasar el modelo *@
             <partial name="_Country" model="Model" />
 

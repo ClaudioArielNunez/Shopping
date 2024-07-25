@@ -41,6 +41,24 @@ namespace Shopping.Controllers
             return View(country);
         }
 
+        // GET: Countries/DetailsState/5
+        public async Task<IActionResult> DetailsState(int? id)
+        {
+            if(id == null || _context.States == null)
+            {
+                return NotFound();
+            }
+            State state = await _context.States
+                .Include(s => s.Cities).FirstOrDefaultAsync(s => s.Id == id);
+
+            if(state == null)
+            {
+                return NotFound();
+            }
+            return View(state);
+        }
+
+
         // GET: Countries/Create
         public IActionResult Create()
         {
@@ -158,7 +176,9 @@ namespace Shopping.Controllers
                 return NotFound();
             }
 
-            var country = await _context.Countries.FindAsync(id);
+            var country = await _context.Countries
+                .Include(c => c.States) //evitamos q la lista de estados llegue nula
+                .FirstOrDefaultAsync(c=>c.Id==id);
             if (country == null)
             {
                 return NotFound();
