@@ -418,7 +418,7 @@ namespace Shopping.Controllers
             }
             
             var city = await _context.Cities
-                .Include(c => c.State) //lo incluimos para volver al state
+                .Include(c => c.State) //lo incluimos para volver al state                
                 .FirstOrDefaultAsync(s => s.Id == id);
             if (city == null)
             {
@@ -429,8 +429,7 @@ namespace Shopping.Controllers
         }
 
         // POST: Countries/DeleteCity/5
-        //[ActionName("DeleteCity")]: Permite que el método del controlador sea llamado mediante
-        //un nombre de acción diferente al nombre del método. 
+        
         [HttpPost, ActionName("DeleteCity")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteCityConfirmed(int id)
@@ -450,7 +449,7 @@ namespace Shopping.Controllers
                 }
 
                 await _context.SaveChangesAsync();
-                TempData["successMessage"] = "Provincia/Departameno eliminado con exito!";
+                TempData["successMessage"] = "Ciudad eliminada con exito!";
                 return RedirectToAction(nameof(DetailsState), new { Id = city.State.Id });
             }
             catch (Exception ex)
