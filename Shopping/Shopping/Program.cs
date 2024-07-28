@@ -14,7 +14,34 @@ namespace Shopping
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(con));
 
+            //Agregamos SeedDb
+            builder.Services.AddTransient<SeedDb>();
+
             var app = builder.Build();
+
+            //creamos metodo para llamar al Seed
+            SeedData(app);
+
+            void SeedData(WebApplication app) 
+            { 
+                // Obtenemos el servicio IServiceScopeFactory del contenedor de servicios de la aplicación
+                IServiceScopeFactory? scopedFactory = app.Services.GetService<IServiceScopeFactory>();
+
+                // Creamos un nuevo scope para limitar el tiempo de vida de los servicios dentro de él
+                using (IServiceScope? scope = scopedFactory.CreateScope())
+                {
+                    // Obtenemos el servicio SeedDb del proveedor de servicios dentro del scope
+                    SeedDb? service = scope.ServiceProvider.GetService<SeedDb>();
+
+                    // Llamamos al método SeedAsync en SeedDb para sembrar los datos de forma asíncrona
+                    service.SeedAsync().Wait();
+                    //el .Wait() bloquea la ejecución hasta que el método asíncrono complete su
+                    //ejecución, lo que es síncrono en términos de la ejecución actual del hilo.
+                }
+            }
+
+
+
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

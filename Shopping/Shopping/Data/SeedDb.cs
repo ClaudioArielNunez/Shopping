@@ -11,6 +11,8 @@ namespace Shopping.Data
             _context = context;
         }
 
+        //Este método se encarga de sembrar datos iniciales en tu base de datos utilizando
+        //servicios registrados en tu contenedor de servicios (IServiceProvider). 
         public async Task SeedAsync()
         {
             await _context.Database.EnsureCreatedAsync(); //crea db y aplica migraciones
@@ -104,5 +106,5 @@ namespace Shopping.Data
                 await _context.SaveChangesAsync();//guardamos
             }
         }
-    }
+    } //Paso siguente: inyectamos el servicio en el program
 }
