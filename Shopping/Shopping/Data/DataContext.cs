@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Shopping.Data.Entities;
 
 namespace Shopping.Data
 {
-    public class DataContext : DbContext
+    //El paquete identity instalado debe coincidir con la version de .net, sino devuelve error
+    public class DataContext : IdentityDbContext<User>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) 
         {

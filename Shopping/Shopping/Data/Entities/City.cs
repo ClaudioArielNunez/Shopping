@@ -13,5 +13,8 @@ namespace Shopping.Data.Entities
 
         //Pertenece a un estado
         public State State { get; set; }
+
+        //Luego de tener la clase user, agregamos esta prop
+        public ICollection<User> Users { get; set; } //una ciudad puede tener muchos usuarios
     }
 }
