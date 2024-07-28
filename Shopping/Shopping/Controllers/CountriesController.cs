@@ -65,6 +65,25 @@ namespace Shopping.Controllers
         }
 
 
+        // GET: Countries/DetailsCity/5
+        public async Task<IActionResult> DetailsCity(int? id)
+        {
+            if (id == null || _context.States == null)
+            {
+                return NotFound();
+            }
+            City city = await _context.Cities
+                .Include(c => c.State) //Con esta linea hacemos q el boton volver nos regrese al pais q corresponde                
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (city == null)
+            {
+                return NotFound();
+            }
+            return View(city);
+        }
+
+
         // GET: Countries/Create
         public IActionResult Create()
         {
@@ -336,6 +355,57 @@ namespace Shopping.Controllers
             {
                 TempData["errorMessage"] = ex.Message;
                 return RedirectToAction(nameof(Delete),new { Id = id });                    
+            }
+        }
+
+        // GET: Countries/DeleteState/5
+        public async Task<IActionResult> DeleteState(int? id)
+        {
+            if (id == null || _context.States == null)
+            {
+                return NotFound();
+            }
+            //mostramos los ciudades con include
+            var state = await _context.States
+                .Include(s => s.Country) //lo incluimos para volver al pais
+                .FirstOrDefaultAsync(s => s.Id == id);
+            if (state == null)
+            {
+                return NotFound();
+            }
+
+            return View(state);
+        }
+
+        // POST: Countries/Delete/5
+        //[ActionName("DeleteState")]: Permite que el método del controlador sea llamado mediante
+        //un nombre de acción diferente al nombre del método. 
+        [HttpPost, ActionName("DeleteState")] 
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteStateConfirmed(int id)
+        {
+            try
+            {
+                if (_context.States == null)
+                {
+                    return Problem("Entity set 'DataContext.States'  is null.");
+                }
+                var state = await _context.States
+                    .Include(s => s.Country) //esta linea evita que el country del state sea null
+                    .FirstOrDefaultAsync(s => s.Id == id);
+                if (state != null)
+                {
+                    _context.States.Remove(state);
+                }
+
+                await _context.SaveChangesAsync();
+                TempData["successMessage"] = "Provincia/Departameno eliminado con exito!";
+                return RedirectToAction(nameof(Details), new {Id = state.Country.Id});
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = ex.Message;
+                return RedirectToAction(nameof(Delete), new { Id = id });
             }
         }
 
