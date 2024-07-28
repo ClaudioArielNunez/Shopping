@@ -377,7 +377,7 @@ namespace Shopping.Controllers
             return View(state);
         }
 
-        // POST: Countries/Delete/5
+        // POST: Countries/DeleteState/5
         //[ActionName("DeleteState")]: Permite que el método del controlador sea llamado mediante
         //un nombre de acción diferente al nombre del método. 
         [HttpPost, ActionName("DeleteState")] 
@@ -405,7 +405,58 @@ namespace Shopping.Controllers
             catch (Exception ex)
             {
                 TempData["errorMessage"] = ex.Message;
-                return RedirectToAction(nameof(Delete), new { Id = id });
+                return RedirectToAction(nameof(DeleteState), new { Id = id });
+            }
+        }
+
+        // GET: Countries/DeleteCity/5
+        public async Task<IActionResult> DeleteCity(int? id)
+        {
+            if (id == null || _context.States == null)
+            {
+                return NotFound();
+            }
+            
+            var city = await _context.Cities
+                .Include(c => c.State) //lo incluimos para volver al state
+                .FirstOrDefaultAsync(s => s.Id == id);
+            if (city == null)
+            {
+                return NotFound();
+            }
+
+            return View(city);
+        }
+
+        // POST: Countries/DeleteCity/5
+        //[ActionName("DeleteCity")]: Permite que el método del controlador sea llamado mediante
+        //un nombre de acción diferente al nombre del método. 
+        [HttpPost, ActionName("DeleteCity")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteCityConfirmed(int id)
+        {
+            try
+            {
+                if (_context.Cities == null)
+                {
+                    return Problem("Entity set 'DataContext.States'  is null.");
+                }
+                var city = await _context.Cities
+                    .Include(c => c.State) //esta linea evita que el state de la city sea null                    
+                    .FirstOrDefaultAsync(c => c.Id == id);
+                if (city != null)
+                {
+                    _context.Cities.Remove(city);
+                }
+
+                await _context.SaveChangesAsync();
+                TempData["successMessage"] = "Provincia/Departameno eliminado con exito!";
+                return RedirectToAction(nameof(DetailsState), new { Id = city.State.Id });
+            }
+            catch (Exception ex)
+            {
+                TempData["errorMessage"] = ex.Message;
+                return RedirectToAction(nameof(DeleteCity), new { Id = id });
             }
         }
 
