@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Shopping.Data;
+using Shopping.Helpers;
 
 namespace Shopping
 {
@@ -16,6 +17,8 @@ namespace Shopping
 
             //Agregamos SeedDb
             builder.Services.AddTransient<SeedDb>();
+            //Agregamos userHelper
+            builder.Services.AddScoped<IUserHelper,UserHelper>();
 
             var app = builder.Build();
 
