@@ -1,5 +1,7 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Shopping.Data;
+using Shopping.Data.Entities;
 using Shopping.Helpers;
 
 namespace Shopping
@@ -14,6 +16,18 @@ namespace Shopping
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(con));
+
+            //Agregamos restricciones de user, role
+            builder.Services.AddIdentity<User, IdentityRole>(cfg =>
+            {
+                cfg.User.RequireUniqueEmail = true; //email unico
+                cfg.Password.RequireDigit = false; //restricciones de password
+                cfg.Password.RequiredUniqueChars = 0;
+                cfg.Password.RequireLowercase = false;
+                cfg.Password.RequireNonAlphanumeric = false;
+                cfg.Password.RequireUppercase = false;
+                //cfg.Password.RequiredLength = 6; //largo minimo por defecto es 6
+            }).AddEntityFrameworkStores<DataContext>();
 
             //Agregamos SeedDb
             builder.Services.AddTransient<SeedDb>();
@@ -44,8 +58,6 @@ namespace Shopping
             }
 
 
-
-
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
@@ -58,6 +70,9 @@ namespace Shopping
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            //para los usuarios
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
