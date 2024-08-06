@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Shopping.Data;
 using Shopping.Data.Entities;
+using Shopping.Models;
 
 namespace Shopping.Helpers
 {
@@ -10,13 +11,15 @@ namespace Shopping.Helpers
         private readonly DataContext _context;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly SignInManager<User> _signInManager;
 
-        //creo constructor, inyectamos context, user, roles
-        public UserHelper(DataContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+        //creo constructor, inyectamos context, manejador de user, manejador de roles, manejador de logeo
+        public UserHelper(DataContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager, SignInManager<User> signInManager)
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
+            _signInManager = signInManager;
         }
         public async Task<IdentityResult> AddUserAsync(User user, string password)
         {
@@ -35,10 +38,11 @@ namespace Shopping.Helpers
             {
                 await _roleManager.CreateAsync(new IdentityRole
                 {
-                    Name = roleName                    
+                    Name = roleName
                 });
             }
         }
+        
 
         public async Task<User> GetUserAsync(string email)
         {
@@ -50,6 +54,15 @@ namespace Shopping.Helpers
         public async Task<bool> IsUserInRoleAsync(User user, string roleName)
         {
             return await _userManager.IsInRoleAsync(user, roleName);
+        }
+
+        public async Task<SignInResult> LoginAsync(LoginViewModel model)
+        {
+            return await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, false);
+        }
+        public async Task LogoutAsync()
+        {
+            await _signInManager.SignOutAsync();
         }
     }
 }
