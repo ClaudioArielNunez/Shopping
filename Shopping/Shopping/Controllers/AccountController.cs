@@ -47,5 +47,11 @@ namespace Shopping.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+
+        //Get 
+        public IActionResult NotAuthorized()
+        {
+            return View();
+        }
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.CodeAnalysis.Options;
 using Microsoft.EntityFrameworkCore;
 using Shopping.Data;
 using Shopping.Data.Entities;
@@ -28,6 +29,13 @@ namespace Shopping
                 cfg.Password.RequireUppercase = false;
                 //cfg.Password.RequiredLength = 6; //largo minimo por defecto es 6
             }).AddEntityFrameworkStores<DataContext>();
+
+            //Agregamos control de cookies
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Account/NotAuthorized";
+                options.AccessDeniedPath = "/Account/NotAuthorized";
+            });
 
             //Agregamos SeedDb
             builder.Services.AddTransient<SeedDb>();
@@ -65,6 +73,9 @@ namespace Shopping
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            //Configuramos cuando la pagina no se encuentre
+            app.UseStatusCodePagesWithReExecute("/error/{0}");
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
