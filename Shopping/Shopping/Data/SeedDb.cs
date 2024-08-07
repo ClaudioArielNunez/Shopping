@@ -25,6 +25,7 @@ namespace Shopping.Data
             await CheckCountriesAsync();   //crea los paises cuando no existen
             await CheckRoleAsync(); //crea los roles, necesita la interfaz IUserHelper
             await CheckUserAsync("1010", "Claudio", "Nunez", "clau@yopmail.com", "322 311 4620", "Acasuso 822", UserType.Admin);
+            await CheckUserAsync("2020", "Ariel", "Nunez", "ariel@yopmail.com", "422 311 4620", "Acasuso 900", UserType.User);
         }
 
         private async Task<User> CheckUserAsync(string document, string firstName, string lastName, string email, string phone, string address, UserType userType)

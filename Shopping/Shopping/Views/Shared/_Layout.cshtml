@@ -25,12 +25,34 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Categories" asp-action="Index">Categorías</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Countries" asp-action="Index">Países</a>
-                        </li>
+                        @* evito que un usuario normal vea estas opciones *@
+                        @if(User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Categories" asp-action="Index">Categorías</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Countries" asp-action="Index">Países</a>
+                            </li>
+                        }
+                    </ul>
+                    @* creamos el navbar con usuario y login *@
+                    <ul class="nav navbar-nav me-auto">
+                        @* solo si el usuario esta logueado vera esto *@
+                        @if(User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item" >
+                                <a class="nav-link text-dark" asp-controller="Account" asp-area="" asp-action="ChangeUser">@User.Identity.Name</a>
+                            </li>
+                            <li class="nav-item" >
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Cerrar Sesión</a>
+                            </li>
+                        }else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Iniciar Sesión</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
