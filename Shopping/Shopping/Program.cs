@@ -41,6 +41,8 @@ namespace Shopping
             builder.Services.AddTransient<SeedDb>();
             //Agregamos userHelper
             builder.Services.AddScoped<IUserHelper,UserHelper>();
+            //Agregamos servicio para usar los comboBox
+            builder.Services.AddScoped<IComboHelper, ComboHelper>();
 
             var app = builder.Build();
 
