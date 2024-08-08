@@ -48,7 +48,7 @@ namespace Shopping.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        //Get 
+        //Get - Configuramos pagina de user not autorized
         public IActionResult NotAuthorized()
         {
             return View();
